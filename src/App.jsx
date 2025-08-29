@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { validateWord } from './utils/validation';
 import { isValidEnglishWord } from './utils/api';
+import Timer from './components/Timer';
 
 function App() {
   const [players, setPlayers] = useState([
@@ -12,6 +13,24 @@ function App() {
   const [inputWord, setInputWord] = useState('');
   const [error, setError] = useState('');
   const [lastWord, setLastWord] = useState(null);
+  const [time, setTime] = useState(15);
+  const [timerKey, setTimerKey] = useState(0);
+
+  const handleTimeout = (action) => {
+    if (action === 'tick') {
+      setTime((prev) => prev - 1);
+    } else {
+      setPlayers((prev) =>
+        prev.map((p, i) =>
+          i === currentPlayer ? { ...p, score: p.score - 1 } : p
+        )
+      );
+      setError('Time up! Point deducted.');
+      setCurrentPlayer((prev) => (prev === 0 ? 1 : 0));
+      setTime(15);
+      setTimerKey((k) => k + 1);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +38,6 @@ function App() {
     if (!trimmed) return;
 
     const { valid, message } = validateWord(trimmed, wordHistory, lastWord);
-
     if (!valid) {
       setPlayers((prev) =>
         prev.map((p, i) =>
@@ -53,6 +71,8 @@ function App() {
     setCurrentPlayer((prev) => (prev === 0 ? 1 : 0));
     setError('');
     setInputWord('');
+    setTime(15);
+    setTimerKey((k) => k + 1);
   };
 
   return (
@@ -73,12 +93,22 @@ function App() {
         ))}
       </div>
 
+      <div className="flex flex-col items-center mb-3">
+        <h2 className="text-xl font-semibold mb-2">
+          {players[currentPlayer].name}'s Turn
+        </h2>
+        <Timer time={time} onTimeout={handleTimeout} resetKey={timerKey} />
+      </div>
+
       <form onSubmit={handleSubmit} className="flex gap-2 mb-3">
         <input
           className="border p-2 rounded w-64"
           placeholder="Enter a word"
           value={inputWord}
-          onChange={(e) => setInputWord(e.target.value)}
+          onChange={(e) => {
+            setError('');
+            setInputWord(e.target.value);
+          }}
         />
         <button
           type="submit"
