@@ -102,7 +102,12 @@ function App() {
         error={error}
       />
 
-      <WordHistory wordHistory={wordHistory} />
+      <WordHistory
+        wordHistory={wordHistory}
+        lastWord={lastWord}
+        lastPlayerIndex={currentPlayer === 0 ? 1 : 0}
+        players={players}
+      />
     </div>
   );
 }
