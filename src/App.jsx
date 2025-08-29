@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { validateWord } from './utils/validation';
+import { isValidEnglishWord } from './utils/api';
 
 function App() {
   const [players, setPlayers] = useState([
@@ -12,7 +13,7 @@ function App() {
   const [error, setError] = useState('');
   const [lastWord, setLastWord] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const trimmed = inputWord.trim().toLowerCase();
     if (!trimmed) return;
@@ -26,6 +27,18 @@ function App() {
         )
       );
       setError(message);
+      setInputWord('');
+      return;
+    }
+
+    const isEnglish = await isValidEnglishWord(trimmed);
+    if (!isEnglish) {
+      setPlayers((prev) =>
+        prev.map((p, i) =>
+          i === currentPlayer ? { ...p, score: p.score - 1 } : p
+        )
+      );
+      setError('Word is not a valid English word');
       setInputWord('');
       return;
     }
@@ -60,7 +73,6 @@ function App() {
         ))}
       </div>
 
-      {/* Input Box */}
       <form onSubmit={handleSubmit} className="flex gap-2 mb-3">
         <input
           className="border p-2 rounded w-64"
