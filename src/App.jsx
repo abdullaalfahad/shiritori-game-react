@@ -1,12 +1,27 @@
 import { useState } from 'react';
 
 function App() {
-  const [players] = useState([
+  const [players, setPlayers] = useState([
     { name: 'Player 1', score: 0 },
     { name: 'Player 2', score: 0 },
   ]);
   const [currentPlayer, setCurrentPlayer] = useState(0);
   const [wordHistory, setWordHistory] = useState([]);
+  const [inputWord, setInputWord] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!inputWord.trim()) return;
+
+    // Add word to history (validation will come later)
+    setWordHistory([...wordHistory, inputWord.toLowerCase()]);
+
+    // Switch player
+    setCurrentPlayer((prev) => (prev === 0 ? 1 : 0));
+
+    // Clear input
+    setInputWord('');
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
@@ -26,6 +41,22 @@ function App() {
           </div>
         ))}
       </div>
+
+      {/* Input Box */}
+      <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
+        <input
+          className="border p-2 rounded w-64"
+          placeholder="Enter a word"
+          value={inputWord}
+          onChange={(e) => setInputWord(e.target.value)}
+        />
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Submit
+        </button>
+      </form>
 
       {/* Word History */}
       <div className="bg-white p-4 rounded-xl shadow w-full max-w-lg">
