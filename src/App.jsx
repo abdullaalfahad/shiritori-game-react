@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { validateWord } from './utils/validation';
 import { isValidEnglishWord } from './utils/api';
 import Timer from './components/Timer';
+import PlayerCard from './components/PlayerCard';
+import WordInput from './components/WordInput';
+import WordHistory from './components/WordHistory';
 
 function App() {
   const [players, setPlayers] = useState([
@@ -81,15 +84,7 @@ function App() {
 
       <div className="flex gap-10 mb-6">
         {players.map((p, i) => (
-          <div
-            key={i}
-            className={`p-4 rounded-xl shadow ${
-              i === currentPlayer ? 'bg-blue-200' : 'bg-white'
-            }`}
-          >
-            <h2 className="font-bold">{p.name}</h2>
-            <p>Score: {p.score}</p>
-          </div>
+          <PlayerCard key={i} player={p} isActive={i === currentPlayer} />
         ))}
       </div>
 
@@ -100,36 +95,14 @@ function App() {
         <Timer time={time} onTimeout={handleTimeout} resetKey={timerKey} />
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-2 mb-3">
-        <input
-          className="border p-2 rounded w-64"
-          placeholder="Enter a word"
-          value={inputWord}
-          onChange={(e) => {
-            setError('');
-            setInputWord(e.target.value);
-          }}
-        />
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Submit
-        </button>
-      </form>
+      <WordInput
+        inputWord={inputWord}
+        setInputWord={setInputWord}
+        handleSubmit={handleSubmit}
+        error={error}
+      />
 
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-
-      <div className="bg-white p-4 rounded-xl shadow w-full max-w-lg">
-        <h3 className="font-bold mb-2">Word History</h3>
-        <ul className="flex flex-wrap gap-2">
-          {wordHistory.map((w, i) => (
-            <li key={i} className="px-3 py-1 bg-gray-200 rounded">
-              {w}
-            </li>
-          ))}
-        </ul>
-      </div>
+      <WordHistory wordHistory={wordHistory} />
     </div>
   );
 }
